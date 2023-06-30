@@ -1,0 +1,32 @@
+from flask import Flask, render_template
+from flask_socketio import SocketIO, emit
+import os
+# PORT = os.environ["PORT"] 
+# serverIP = "0.0.0.0"
+app = Flask(__name__)
+# app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
+
+# 当客户端连接时触发
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected')
+
+# 当接收到画笔坐标时触发
+@socketio.on('draw')
+def handle_draw(data):
+    # 将接收到的坐标广播给所有连接的客户端
+    emit('draw', data, broadcast=True)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/hello')
+def hello():
+    return "hello"
+
+
+if __name__ == '__main__':
+    socketio.run(app, debug=True)
+    print('socket io start')
